@@ -1,0 +1,6 @@
+﻿  main.cpp
+C:\Users\fired\OneDrive\c++\labs\theWitcher4\theWitcher4\main.cpp(35,108): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\fired\OneDrive\c++\labs\theWitcher4\theWitcher4\main.cpp(36,109): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\fired\OneDrive\c++\labs\theWitcher4\theWitcher4\main.cpp(37,109): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+C:\Users\fired\OneDrive\c++\labs\theWitcher4\theWitcher4\main.cpp(38,111): warning C4244: аргумент: преобразование "double" в "float", возможна потеря данных
+  theWitcher4.vcxproj -> C:\Users\fired\OneDrive\c++\labs\theWitcher4\x64\Debug\theWitcher4.exe
