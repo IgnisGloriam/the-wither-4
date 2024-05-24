@@ -9,77 +9,77 @@
 #include <SFML/Graphics.hpp>
 
 
-class Player
+class player
 {
 public:
-	Player();
+	player();
 	// направления движения игрока
 	enum class playermove {
-		UpPressed, UpRg, UpLf, DownPressed,
-		DownRg, DownLf, LeftPressed, RightPressed, Stop
+		uppressed, uprg, uplf, downpressed,
+		downrg, downlf, leftpressed, rightpressed, stop
 	};
 	// метод появление игрока на игровом поле
-	void spawn(sf::IntRect planet, sf::Vector2f resolution, int tileSize);
+	//void spawn(sf::intrect planet, sf::vector2f resolution, int tilesize);
 	// метод рестарт параметров игрока
-	void resetPlayerStats();
+	void resetplayerstats();
 	// возвращает состояние жизни игрока
-	bool getLive() const;
+	bool getlive() const;
 	// метод получения урона игроком
-	bool hit(sf::Time timeHit);
+	//bool hit(sf::time timehit);
 	// возвращает время как давно был последний удар по игроку
-	sf::Time getLastHitTime() const;
+	//sf::time getlasthittime() const;
 	// возвращает координаты игрока
-	sf::FloatRect getPosition() const;
+	//sf::floatrect getposition() const;
 	// возвращает центральные координаты игрока
-	sf::Vector2f getCenter() const;
+	//sf::vector2f getcenter() const;
 	// возвращает угол поворота игрока
-	float getRotation() const;
+	float getrotation() const;
 	// возвращает копию спрайта игрока
-	sf::Sprite getSprite() const;
+	//sf::sprite getsprite() const;
 	// рисуем игрока
-	void draw(sf::RenderWindow& win) const;
+	//void draw(sf::renderwindow& win) const;
 	// перемещаем игрока
 	void move(playermove mov);
 	// обновление игровой логики 
-	void update(sf::Time deltaTime, sf::Vector2i mousePosition);
+	//void update(sf::time deltatime, sf::vector2i mouseposition);
 	// увеличиваем максимальное количество здоровья 
-	void upgradeHealth(float heal);
+	void upgradehealth(float heal);
 	// пополняем здоровье игрока
-	void increaseHealthLevel(float amount);
+	void increasehealthlevel(float amount);
 	// возвращает сколько здоровья у игрока на данный момент?
-	float getHealth() const;
+	float gethealth() const;
 	// возвращает максимальное здоровье игрока
-	float getMaxHealth() const;
+	float getmaxhealth() const;
 
 private:
 	// стартовая жизнь игрока
-	const float START_HEALTH = 200;
+	const float start_health = 200;
 	// позиция игрока
-	sf::Vector2f m_Position;
+	//sf::vector2f m_position;
 	// отображение игрока спрайт и  объект анимации
-	sf::Sprite m_Sprite;
+	//sf::sprite m_sprite;
 	
 	// разрешение анимировать игрока
-	bool m_animMove = false;
+	bool m_animmove = false;
 	// разрешение экрана
-	sf::Vector2f m_Resolution;
+	//sf::vector2f m_resolution;
 	// размер игрового поля 
-	sf::IntRect m_planet;
+	//sf::intrect m_planet;
 	// размер текстур игрового поля 
-	int m_TileSize;
+	int m_tilesize;
 	// в каком направлении(ях) движется игрок в данный момент
 	playermove m_move;
 	// живой ли игрок
 	bool m_live = true;
 	// здоровье игрока
-	float m_Health;
+	float m_health;
 	// максимальное здоровье игрока
-	float m_MaxHealth;
+	float m_maxhealth;
 	// время нанесения последнего удара по игроку 
-	sf::Time m_LastHit;
+	//sf::time m_lasthit;
 	// частота перемещения игрока
-	sf::Time m_time_moving;
+	//sf::time m_time_moving;
 	// скорость перемещения игрока в пикселях в секунду
-	float m_Speed;
+	float m_speed;
 
 };
