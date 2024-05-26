@@ -8,7 +8,7 @@
 // Константы игры
 const int h = 800, w = 600;
 const float SwordDuration = 0.3f;
-const float SwordRotationSpeed = 120.0f; // Скорость вращения меча (градусы в секунду)
+const float SwordRotationSpeed = 200.0f; // Скорость вращения меча (градусы в секунду)
 const float CameraSmoothness = 0.1f; // Коэффициент плавности камеры
 const sf::Vector2f MapSize(2000, 2000); // Размер карты
 
@@ -63,7 +63,7 @@ int main() {
 	// Загружаем текстуру для рестарта
 	sf::Texture witcherDTexture;
 	if (!witcherDTexture.loadFromFile("images/witcherDead.png")) {
-		std::cerr << "Error: Could not load witcher texture" << std::endl;
+		std::cerr << "Error: Could not load witcherDead texture" << std::endl;
 		return -1;
 	}
 	sf::Sprite witcherD(witcherDTexture);
@@ -94,7 +94,26 @@ int main() {
 		return -1;
 	}
 	sf::Sprite sword(swordTexture);
-	sword.setOrigin(0, swordTexture.getSize().y / 2);
+	sword.setOrigin(-14, swordTexture.getSize().y / 2);
+
+	// Сердечко и score
+	sf::Texture tHeart;
+	if (!tHeart.loadFromFile("images/Heart.png")) {
+		std::cerr << "Error: Could not load Heart texture" << std::endl;
+		return -1;
+	}
+	sf::Sprite Heart(tHeart);
+	Heart.setOrigin(tHeart.getSize().x / 2, tHeart.getSize().y / 2);
+	Heart.setPosition(10, 20);
+
+	sf::Texture tStar;
+	if (!tStar.loadFromFile("images/Star.png")) {
+		std::cerr << "Error: Could not load Star texture" << std::endl;
+		return -1;
+	}
+	sf::Sprite Star(tStar);
+	Star.setOrigin(tStar.getSize().x / 2, tStar.getSize().y / 2);
+	Star.setPosition(10, 50);
 
 	// Загружаем текстуру огненного шара
 	sf::Texture fireballTexture;
@@ -130,11 +149,11 @@ int main() {
 	// Текст для отображения количества жизней и убитых врагов
 	sf::Text livesText("Lives: 3", font, 24);
 	sf::Text killsText("Kills: 0", font, 24);
-	livesText.setPosition(10, 10);
-	killsText.setPosition(10, 40);
+	livesText.setPosition(30, 10);
+	killsText.setPosition(30, 40);
 
 	// Текст для меню улучшений
-	sf::Text upgradeMenuText("Choose an upgrade:\n1. Increase Speed\n2. Decrease Sword Cooldown\n3. Decrease Fire Cooldown\n4. Decrease Enemy Speed\n5. Increase Fireball Speed", 
+	sf::Text upgradeMenuText("Choose an upgrade:\n1. Increase Speed\n2. Decrease Sword Cooldown\n3. Decrease Fire Cooldown\n4. Decrease Enemy Speed\n5. Increase Fireball Speed\n6. Increase Lives", 
 		font, 20);
 	upgradeMenuText.setPosition(100, 200);
 
@@ -154,10 +173,11 @@ int main() {
 	float timeSinceLastFire = 0.0f;
 
 	// Параметры для увеличения числа врагов
-	int initialEnemySpawnRate = 100; // Начальная вероятность спавна врага
+	int initialEnemySpawnRate = 600; // Задержка спавна врага
 	int enemySpawnRate = initialEnemySpawnRate;
+	int enemySpawn = 0;
 	float timeSinceStart = 0.0f;
-	float spawnIncreaseInterval = 5.0f; // Интервал времени, через который увеличивается количество врагов
+	float spawnIncreaseInterval = 10.0f; // Интервал времени, через который увеличивается количество врагов
 
 	// Параметры игры
 	int lives = 3;
@@ -248,7 +268,7 @@ int main() {
 				mousePosition += hero.getPosition();
 				mousePosition.x -= h / 2;//поправка на ветер
 				mousePosition.y -= w / 2;
-				hero.setRotation(angleToTarget(hero.getPosition(), mousePosition));
+				hero.setRotation(angleToTarget(hero.getPosition(), mousePosition) + 90);
 			}
 			sf::Vector2f movement(0.0f, 0.0f);
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
@@ -297,26 +317,39 @@ int main() {
 				float length = std::sqrt(fireball.direction.x * fireball.direction.x + fireball.direction.y * fireball.direction.y);
 				fireball.direction /= length;
 				fireball.elapsedTime = 0.0f;
-
+				sf::Vector2f mousePosition2 = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+				mousePosition2 += hero.getPosition();
+				mousePosition2.x -= h / 2;//поправка на ветер
+				mousePosition2.y -= w / 2;
+				
+				fireball.sprite.setRotation(angleToTarget(hero.getPosition(), mousePosition2));
 				fireballs.push_back(fireball);
 			}
 
 			// Создание врагов с увеличением частоты спавна
-			if (std::rand() % 1000000 < enemySpawnRate) {
+			if (enemySpawn > enemySpawnRate) {
+				enemySpawn = 0;
 				sf::Sprite enemy(enemyTexture);
 				float angle = std::rand() % 360 * 3.14f / 180;
 				enemy.setPosition(hero.getPosition().x + std::cos(angle) * 500, hero.getPosition().y + std::sin(angle) * 500);
 				enemies.push_back(enemy);
 			}
+			else {
+				++enemySpawn;
+			}
 
 			// Увеличение частоты спавна врагов
 			if (timeSinceStart >= spawnIncreaseInterval) {
-				enemySpawnRate += 10;
+				enemySpawnRate /= 2;
+				enemySpawnRate += 40;
 				timeSinceStart = 0.0f;
 			}
 
 			// Обновление врагов
 			for (auto& enemy : enemies) {
+				
+				enemy.setRotation(angleToTarget(enemy.getPosition(), hero.getPosition()) + 90);
+
 				sf::Vector2f direction = hero.getPosition() - enemy.getPosition();
 				float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 				direction /= length;
@@ -361,6 +394,7 @@ int main() {
 			auto fireIt = fireballs.begin();
 			while (fireIt != fireballs.end()) {
 				fireIt->elapsedTime += deltaTime;
+				//fireIt->setRotation(fireIt->angle)
 				if (fireIt->elapsedTime >= FireDuration) {
 					fireIt = fireballs.erase(fireIt);
 				}
@@ -393,7 +427,7 @@ int main() {
 
 			// Проверка коллизий между врагами и героем
 			for (const auto& enemy : enemies) {
-				if (distance(hero.getPosition(), enemy.getPosition()) < 50) {
+				if (distance(hero.getPosition(), enemy.getPosition()) < 10) {
 					lives--;
 					enemies.clear();
 					if (lives <= 0) {
@@ -423,6 +457,7 @@ int main() {
 			window.clear();
 			window.draw(field); // Рисуем поле на заднем плане
 			window.draw(hero);
+			
 			for (const auto& enemy : enemies) {
 				window.draw(enemy);
 			}
@@ -437,6 +472,8 @@ int main() {
 			window.setView(window.getDefaultView());
 			window.draw(livesText);
 			window.draw(killsText);
+			window.draw(Heart);
+			window.draw(Star);
 			window.display();
 
 
@@ -480,22 +517,24 @@ int main() {
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
-				SwordCooldown -= 0.03f;
-				if (SwordCooldown < 0.3f) SwordCooldown = 0.3f;
+
+				SwordCooldown = 0.3f + SwordCooldown / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
-				FireCooldown -= 0.03f;
-				if (FireCooldown < 0.3f) FireCooldown = 0.3f;
+				FireCooldown = 0.3f + FireCooldown / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
-				EnemySpeed -= 0.1f;
-				if (EnemySpeed < 0.1f) EnemySpeed = 0.1f;
+				EnemySpeed = 0.2f + EnemySpeed / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
-				FireSpeed += 0.1f;
+				FireSpeed += 0.2f;
+				gameState = GameState::Playing;
+			}
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6)) {
+				++lives;
 				gameState = GameState::Playing;
 			}
 
