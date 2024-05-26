@@ -331,6 +331,7 @@ int main() {
 				enemySpawn = 0;
 				sf::Sprite enemy(enemyTexture);
 				float angle = std::rand() % 360 * 3.14f / 180;
+				enemy.setOrigin(enemyTexture.getSize().x / 2, enemyTexture.getSize().y / 2);
 				enemy.setPosition(hero.getPosition().x + std::cos(angle) * 500, hero.getPosition().y + std::sin(angle) * 500);
 				enemies.push_back(enemy);
 			}
@@ -427,7 +428,7 @@ int main() {
 
 			// Проверка коллизий между врагами и героем
 			for (const auto& enemy : enemies) {
-				if (distance(hero.getPosition(), enemy.getPosition()) < 10) {
+				if (distance(hero.getPosition(), enemy.getPosition()) < 50) {
 					lives--;
 					enemies.clear();
 					if (lives <= 0) {
