@@ -10,7 +10,7 @@ const int h = 800, w = 600;
 const float SwordDuration = 0.3f;
 const float SwordRotationSpeed = 200.0f; // Скорость вращения меча (градусы в секунду)
 const float CameraSmoothness = 0.1f; // Коэффициент плавности камеры
-const sf::Vector2f MapSize(2000, 2000); // Размер карты
+const sf::Vector2f MapSize(5000, 5000); // Размер карты
 
 
 const float FireDuration = 3.0f; // Продолжительность полёта огня
@@ -104,7 +104,7 @@ int main() {
 	}
 	sf::Sprite Heart(tHeart);
 	Heart.setOrigin(tHeart.getSize().x / 2, tHeart.getSize().y / 2);
-	Heart.setPosition(10, 20);
+	Heart.setPosition(30, 30);
 
 	sf::Texture tStar;
 	if (!tStar.loadFromFile("images/Star.png")) {
@@ -113,7 +113,7 @@ int main() {
 	}
 	sf::Sprite Star(tStar);
 	Star.setOrigin(tStar.getSize().x / 2, tStar.getSize().y / 2);
-	Star.setPosition(10, 50);
+	Star.setPosition(30, 70);
 
 	// Загружаем текстуру огненного шара
 	sf::Texture fireballTexture;
@@ -149,8 +149,8 @@ int main() {
 	// Текст для отображения количества жизней и убитых врагов
 	sf::Text livesText("Lives: 3", font, 24);
 	sf::Text killsText("Kills: 0", font, 24);
-	livesText.setPosition(30, 10);
-	killsText.setPosition(30, 40);
+	livesText.setPosition(60, 20);
+	killsText.setPosition(60, 60);
 
 	// Текст для меню улучшений
 	sf::Text upgradeMenuText("Choose an upgrade:\n1. Increase Speed\n2. Decrease Sword Cooldown\n3. Decrease Fire Cooldown\n4. Decrease Enemy Speed\n5. Increase Fireball Speed\n6. Increase Lives", 
@@ -232,7 +232,7 @@ int main() {
 			window.draw(mainMenuText);
 			window.display();
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 				gameState = GameState::Playing;
 				lives = 3;
 				kills = 0;
@@ -282,7 +282,7 @@ int main() {
 
 			// Ограничиваем движение героя границами карты
 			sf::Vector2f newHeroPosition = hero.getPosition() + movement;
-			if (newHeroPosition.x > 0 && newHeroPosition.x < MapSize.x && newHeroPosition.y > 0 && newHeroPosition.y < MapSize.y) {
+			if (newHeroPosition.x > 0 + h / 2 && newHeroPosition.x < MapSize.x - h / 2 && newHeroPosition.y > 0 + h / 2 && newHeroPosition.y < MapSize.y - h / 2) {
 				hero.move(movement);
 			}
 
@@ -322,7 +322,7 @@ int main() {
 				mousePosition2.x -= h / 2;//поправка на ветер
 				mousePosition2.y -= w / 2;
 				
-				fireball.sprite.setRotation(angleToTarget(hero.getPosition(), mousePosition2));
+				fireball.sprite.setRotation(angleToTarget(hero.getPosition(), mousePosition2)+90);
 				fireballs.push_back(fireball);
 			}
 
@@ -498,7 +498,7 @@ int main() {
 			window.draw(gameOverText);
 			window.display();
 
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter) || sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 				gameState = GameState::Playing;
 				lives = 3;
 				kills = 0;
