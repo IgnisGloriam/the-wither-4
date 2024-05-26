@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <cmath>
 #include <iostream>
@@ -169,7 +170,29 @@ int main() {
 	// Устанавливаем начальное состояние игры
 	GameState gameState = GameState::MainMenu;
 
+	// Загружаем музыку для меню и геймплея
+	sf::Music menuMusic;
+	if (!menuMusic.openFromFile("audio/witcherTheme.ogg")) {
+		std::cerr << "Error: Could not load menu music" << std::endl;
+		return -1;
+	}
 
+	sf::Music gameMusic;
+	if (!gameMusic.openFromFile("audio/witcherFight.ogg")) {
+		std::cerr << "Error: Could not load game music" << std::endl;
+		return -1;
+	}
+
+
+	sf::SoundBuffer deathSoundBuffer;
+	if (!deathSoundBuffer.loadFromFile("audio/deathSound.ogg")) {
+		std::cerr << "Error: Could not load death sound" << std::endl;
+		return -1;
+	}
+	sf::Sound deathSound(deathSoundBuffer);
+
+
+	menuMusic.play();
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -180,6 +203,9 @@ int main() {
 		float deltaTime = clock.restart().asSeconds();
 
 		if (gameState == GameState::MainMenu) {
+			if (menuMusic.getStatus() != sf::Music::Playing) {
+				menuMusic.play();
+			}
 			// Рендеринг меню
 			window.clear();
 			window.draw(witcher);
@@ -194,10 +220,14 @@ int main() {
 				enemies.clear();
 				fireballs.clear();
 				hero.setPosition(MapSize.x / 2, MapSize.y / 2);
+				menuMusic.stop();
+				gameMusic.play();
 			}
 		}
 		else if (gameState == GameState::Playing) {
-
+			if (gameMusic.getStatus() != sf::Music::Playing) {
+				gameMusic.play();
+			}
 			timeSinceLastSwordAttack += deltaTime;
 			timeSinceStart += deltaTime;
 			timeSinceLastFire += deltaTime;
@@ -272,7 +302,7 @@ int main() {
 			}
 
 			// Создание врагов с увеличением частоты спавна
-			if (std::rand() % 10000 < enemySpawnRate) {
+			if (std::rand() % 1000000 < enemySpawnRate) {
 				sf::Sprite enemy(enemyTexture);
 				float angle = std::rand() % 360 * 3.14f / 180;
 				enemy.setPosition(hero.getPosition().x + std::cos(angle) * 500, hero.getPosition().y + std::sin(angle) * 500);
@@ -281,7 +311,7 @@ int main() {
 
 			// Увеличение частоты спавна врагов
 			if (timeSinceStart >= spawnIncreaseInterval) {
-				enemySpawnRate += 100;
+				enemySpawnRate += 10;
 				timeSinceStart = 0.0f;
 			}
 
@@ -368,6 +398,9 @@ int main() {
 					enemies.clear();
 					if (lives <= 0) {
 						gameState = GameState::GameOver;
+						gameMusic.stop();
+						//menuMusic.play();
+						deathSound.play();
 					}
 					break;
 				}
@@ -418,6 +451,9 @@ int main() {
 
 
 		else if (gameState == GameState::GameOver) {
+			if (menuMusic.getStatus() != sf::Music::Playing && deathSound.getStatus() != sf::Music::Playing) {
+				menuMusic.play();
+			}
 			// Рендеринг меню
 			window.clear();
 			window.draw(witcherD);
@@ -433,6 +469,8 @@ int main() {
 				enemies.clear();
 				fireballs.clear();
 				hero.setPosition(MapSize.x / 2, MapSize.y / 2);
+				menuMusic.stop();
+				gameMusic.play();
 			}
 		}
 
@@ -447,8 +485,8 @@ int main() {
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
-				FireCooldown -= 0.2f;
-				if (FireCooldown < 0.1f) FireCooldown = 0.1f;
+				FireCooldown -= 0.03f;
+				if (FireCooldown < 0.3f) FireCooldown = 0.3f;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
@@ -461,6 +499,9 @@ int main() {
 				gameState = GameState::Playing;
 			}
 
+			if (gameMusic.getStatus() != sf::Music::Playing) {
+				gameMusic.play();
+			}
 			// Рендеринг меню улучшений
 			window.clear();
 			window.draw(upgradeMenuText);
