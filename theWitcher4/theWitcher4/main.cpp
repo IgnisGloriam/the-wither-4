@@ -236,6 +236,9 @@ int main() {
 		}
 		
 	}
+	if (scores.empty()) {
+		scores.insert(0);
+	}
 	fin.close();
 
 	bool youWin = false;
