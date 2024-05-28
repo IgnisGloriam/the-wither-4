@@ -4,6 +4,8 @@
 #include <cmath>
 #include <iostream>
 #include <algorithm>
+#include <set>
+#include <fstream>
 
 // Константы игры
 const int h = 800, w = 600;
@@ -48,7 +50,7 @@ int main() {
 	float FireCooldown = 1.0f;
 	int UpgradeRequided = 100;
 	// Создаем окно приложения
-	sf::RenderWindow window(sf::VideoMode(h, w), "Hero vs Enemies");
+	sf::RenderWindow window(sf::VideoMode(h, w), "the Witcher 4");
 
 	// Загружаем текстуру для меню
 	sf::Texture witcherTexture;
@@ -211,6 +213,32 @@ int main() {
 	}
 	sf::Sound deathSound(deathSoundBuffer);
 
+	sf::SoundBuffer winSoundBuffer;
+	if (!winSoundBuffer.loadFromFile("audio/winSound.ogg")) {
+		std::cerr << "Error: Could not load win sound" << std::endl;
+		return -1;
+	}
+	sf::Sound winSound(winSoundBuffer);
+
+	std::set <int> scores;
+	int s;
+	std::ifstream fin("score.txt");
+	if (fin.is_open())
+	{
+		while (true) {
+			if (fin.eof())
+				break;
+			fin >> s;
+			scores.insert(s);
+			if (fin.eof())
+				break;
+
+		}
+		
+	}
+	fin.close();
+
+	bool youWin = false;
 
 	menuMusic.play();
 	while (window.isOpen()) {
@@ -432,10 +460,19 @@ int main() {
 					lives--;
 					enemies.clear();
 					if (lives <= 0) {
+						youWin = 0;
+						auto t = scores.crbegin();
+						if (kills > *t) {
+							youWin = 1;
+						}
+						scores.insert(kills);
 						gameState = GameState::GameOver;
 						gameMusic.stop();
 						//menuMusic.play();
-						deathSound.play();
+						if(youWin)
+							winSound.play();
+						else
+							deathSound.play();
 					}
 					break;
 				}
@@ -489,13 +526,17 @@ int main() {
 
 
 		else if (gameState == GameState::GameOver) {
-			if (menuMusic.getStatus() != sf::Music::Playing && deathSound.getStatus() != sf::Music::Playing) {
+
+			if (menuMusic.getStatus() != sf::Music::Playing && deathSound.getStatus() != sf::Music::Playing && winSound.getStatus() != sf::Music::Playing) {
 				menuMusic.play();
 			}
 			// Рендеринг меню
 			window.clear();
 			window.draw(witcherD);
-			gameOverText.setString("Game Over! Kills: " + std::to_string(kills) + "\nPress Enter to Restart");
+			if (youWin)
+				gameOverText.setString("New Record! Kills: " + std::to_string(kills) + "\nPress Enter to Restart");
+			else
+				gameOverText.setString("Game Over! Kills: " + std::to_string(kills) + "\nPress Enter to Restart");
 			window.draw(gameOverText);
 			window.display();
 
@@ -550,5 +591,15 @@ int main() {
 		
 	}
 
+
+	std::ofstream fout("score.txt");
+	if (fout.is_open())
+	{
+		for (const auto& kill : scores) {
+			fout << kill << '\n';
+		}
+
+	}
+	fout.close();
 	return 0;
 }
