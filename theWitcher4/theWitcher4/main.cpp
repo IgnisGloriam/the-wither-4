@@ -221,7 +221,7 @@ int main() {
 	sf::Sound winSound(winSoundBuffer);
 
 	std::set <int> scores;
-	int s;
+	int s = 0;
 	std::ifstream fin("score.txt");
 	if (fin.is_open())
 	{
@@ -548,6 +548,16 @@ int main() {
 				lives = 3;
 				kills = 0;
 				tempKills = 0;
+				HeroSpeed = 200.0f;
+				EnemySpeed = 100.0f; /////
+				SwordCooldown = 1.0f;
+				FireSpeed = 500.0f; ////
+				FireCooldown = 1.0f;
+				UpgradeRequided = 100;
+
+				enemySpawn = 0;
+				enemySpawnRate = initialEnemySpawnRate;
+
 				enemies.clear();
 				fireballs.clear();
 				hero.setPosition(MapSize.x / 2, MapSize.y / 2);
