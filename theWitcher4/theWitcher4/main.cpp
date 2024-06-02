@@ -191,6 +191,7 @@ int main() {
 	int kills = 0;
 	int tempKills = 0;
 	int enemyTyper = 0;
+	int needType = 5;
 
 	// Устанавливаем начальную позицию камеры
 	sf::View camera(sf::Vector2f(MapSize.x / 2, MapSize.y / 2), sf::Vector2f(h, w));
@@ -370,7 +371,7 @@ int main() {
 			if (enemySpawn > enemySpawnRate) {
 				enemySpawn = 0;
 				sf::Sprite enemy;
-				if (enemyTyper >= 6) {
+				if (enemyTyper >= needType) {
 					enemyTyper = 0;
 					enemy.setTexture(enemyTexture2);
 					enemy.setScale(1.2, 1.2);
@@ -595,27 +596,44 @@ int main() {
 
 		else if (gameState == GameState::UpgradeMenu) {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+				if (needType > 0) {
+					--needType;
+				}
 				HeroSpeed += 50.0f;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
-
+				if (needType > 0) {
+					--needType;
+				}
 				SwordCooldown = 0.3f + SwordCooldown / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
+				if (needType > 0) {
+					--needType;
+				}
 				FireCooldown = 0.3f + FireCooldown / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
+				if (needType > 0) {
+					--needType;
+				}
 				EnemySpeed = 0.2f + EnemySpeed / 1.5;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num5)) {
+				if (needType > 0) {
+					--needType;
+				}
 				FireSpeed += 0.2f;
 				gameState = GameState::Playing;
 			}
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num6)) {
+				if (needType > 0) {
+					--needType;
+				}
 				++lives;
 				gameState = GameState::Playing;
 			}
