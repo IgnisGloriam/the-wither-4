@@ -82,10 +82,15 @@ int main() {
 	hero.setOrigin(heroTexture.getSize().x / 2, heroTexture.getSize().y / 2);
 	hero.setPosition(MapSize.x / 2, MapSize.y / 2);
 
-	// Загружаем текстуру врага
+	// Загружаем текстуру врагов
 	sf::Texture enemyTexture;
 	if (!enemyTexture.loadFromFile("images/enemy.png")) {
 		std::cerr << "Error: Could not load enemy texture" << std::endl;
+		return -1;
+	}
+	sf::Texture enemyTexture2;
+	if (!enemyTexture2.loadFromFile("images/enemy2.png")) {
+		std::cerr << "Error: Could not load enemy2 texture" << std::endl;
 		return -1;
 	}
 
@@ -185,6 +190,7 @@ int main() {
 	int lives = 3;
 	int kills = 0;
 	int tempKills = 0;
+	int enemyTyper = 0;
 
 	// Устанавливаем начальную позицию камеры
 	sf::View camera(sf::Vector2f(MapSize.x / 2, MapSize.y / 2), sf::Vector2f(h, w));
@@ -219,6 +225,9 @@ int main() {
 		return -1;
 	}
 	sf::Sound winSound(winSoundBuffer);
+
+
+	
 
 	std::set <int> scores;
 	int s = 0;
@@ -360,7 +369,16 @@ int main() {
 			// Создание врагов с увеличением частоты спавна
 			if (enemySpawn > enemySpawnRate) {
 				enemySpawn = 0;
-				sf::Sprite enemy(enemyTexture);
+				sf::Sprite enemy;
+				if (enemyTyper >= 6) {
+					enemyTyper = 0;
+					enemy.setTexture(enemyTexture2);
+					enemy.setScale(1.2, 1.2);
+				}
+				else {
+					++enemyTyper;
+					enemy.setTexture(enemyTexture);
+				}
 				float angle = std::rand() % 360 * 3.14f / 180;
 				enemy.setOrigin(enemyTexture.getSize().x / 2, enemyTexture.getSize().y / 2);
 				enemy.setPosition(hero.getPosition().x + std::cos(angle) * 500, hero.getPosition().y + std::sin(angle) * 500);
@@ -385,7 +403,11 @@ int main() {
 				sf::Vector2f direction = hero.getPosition() - enemy.getPosition();
 				float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 				direction /= length;
-				enemy.move(direction * EnemySpeed * deltaTime);
+				if (enemy.getTexture() == &enemyTexture2) {
+					enemy.move(direction* EnemySpeed* deltaTime *1.5f);
+				}
+				else
+					enemy.move(direction * EnemySpeed * deltaTime);
 			}
 
 			// Проверка коллизий между мечом и врагами
@@ -411,6 +433,10 @@ int main() {
 				while (it != enemies.end() && maxKills > 0) {
 					sword.setPosition(hero.getPosition());
 					if (distance(sword.getPosition(), it->getPosition()) < 80 || distance(a, it->getPosition()) < 80 || distance(b, it->getPosition()) < 80) {
+						if (it->getTexture() == &enemyTexture2) {
+							++kills;
+							++tempKills;
+						}
 						it = enemies.erase(it);
 						++kills;
 						++tempKills;
@@ -469,6 +495,7 @@ int main() {
 							youWin = 1;
 						}
 						scores.insert(kills);
+						std::cout << kills;
 						gameState = GameState::GameOver;
 						gameMusic.stop();
 						//menuMusic.play();
